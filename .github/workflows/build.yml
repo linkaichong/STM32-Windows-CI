@@ -17,18 +17,13 @@ jobs:
     - name: Install ARM toolchain
       run: |
         sudo apt-get update
-        sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi 
-
-    - name: Install Build Tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install cmake ninja-build
+        sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi cmake ninja-build
 
     - name: Verify installations
       run: |
         arm-none-eabi-gcc --version
         cmake --version
-        ninja --version  # 验证 ninja-build 是否正确安装
+        ninja --version  
 
     - name: Build Project
       run: |
