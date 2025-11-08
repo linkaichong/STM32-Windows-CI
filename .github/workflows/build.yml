@@ -14,9 +14,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install ARM GCC Toolchain (Fixed)
+    - name: Install ARM GCC Toolchain
       run: |
-        # 使用您找到的快速下载源 - 选择较新版本
+        # 使用ARM官方工具链
         $url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
         Invoke-WebRequest -Uri $url -OutFile toolchain.zip
         
@@ -28,7 +28,6 @@ jobs:
             Write-Host "✅ 找到 arm-none-eabi-gcc.exe" -ForegroundColor Green
         } else {
             Write-Host "❌ 未找到 arm-none-eabi-gcc.exe" -ForegroundColor Red
-            Write-Host "当前bin目录内容:" -ForegroundColor Yellow
             Get-ChildItem "bin" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  - $($_.Name)" }
             exit 1
         }
@@ -37,13 +36,6 @@ jobs:
         $binPath = (Resolve-Path "bin").Path
         echo "$binPath" >> $env:GITHUB_PATH
         Write-Host "✅ PATH已设置: $binPath" -ForegroundColor Green
-        # 验证工具链可执行文件存在
-        if (Test-Path "$toolchainDir/bin/arm-none-eabi-gcc.exe") {
-            Write-Host "✅ 找到 arm-none-eabi-gcc.exe" -ForegroundColor Green
-        } else {
-            Write-Host "❌ 未找到 arm-none-eabi-gcc.exe，bin目录内容:" -ForegroundColor Red
-            Get-ChildItem "$toolchainDir/bin" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  - $($_.Name)" }
-        }
          
     - name: Install Build Tools
       run: |
