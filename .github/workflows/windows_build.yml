@@ -14,12 +14,6 @@ jobs:
     runs-on: windows-latest
     
     steps:
-     # 新增：清理缓存步骤
-    - name: Clean workspace
-      run: |
-        # 清理工作区，确保从头开始
-        Remove-Item -Recurse -Force * -ErrorAction SilentlyContinue
-
     # 步骤1：检出代码
     - name: Checkout code
       uses: actions/checkout@v4
