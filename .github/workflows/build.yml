@@ -14,23 +14,10 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Build Tools
-      run: |
-        choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
-        choco install ninja -y
-        
-    - name: Verify installations
-      run: |
-        
-        cmake --version
-        ninja --version
-
     - name: Install ARM GCC Toolchain (Fixed)
       run: |
         # 使用您找到的快速下载源 - 选择较新版本
-        $url = "https://sysprogs.com/files/gnutoolchains/arm-eabi/arm-eabi-gcc13.3.1-r3.exe"
-        # 或者备用链接：arm-eabi-gcc12.3.1.exe (53MB，更稳定)
-        
+        $url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
         Invoke-WebRequest -Uri $url -OutFile arm-toolchain.exe
         
         # 静默安装到当前目录
@@ -38,11 +25,18 @@ jobs:
         
         # 设置PATH
         echo "$PWD\arm-toolchain\bin" >> $env:GITHUB_PATH
-
-        echo "Toolchain path: $env:ARM_TOOLCHAIN_PATH"
+        echo "Toolchain path: $env:ARM_TOOLCHAIN_PATH"     
+    
+    - name: Install Build Tools
+      run: |
+        choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
+        choco install ninja -y
+        
+    - name: Verify installations
+      run: |   
+        cmake --version
+        ninja --version 
         arm-none-eabi-gcc --version
-
-      
 
     - name: Build Project
       run: |
