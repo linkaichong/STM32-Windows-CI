@@ -17,8 +17,8 @@ jobs:
     - name: Install ARM GCC Toolchain (智能版本适配)
       run: |
         # 下载工具链
-        #$url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
-        $url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
+        $url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
+        #$url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
         Invoke-WebRequest -Uri $url -OutFile toolchain.zip
         Expand-Archive -Path toolchain.zip -DestinationPath . -Force
         
