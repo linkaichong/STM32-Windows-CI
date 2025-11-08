@@ -11,16 +11,28 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Install ARM toolchain
-      run: sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi 
+      run: |
+        sudo apt-get update
+        sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi 
 
     - name: Install Build Tools
-      run: sudo apt-get install cmake ninja
+      run: |
+        sudo apt-get update
+        sudo apt-get install cmake ninja-build
+
+    - name: Verify installations
+      run: |
+        arm-none-eabi-gcc --version
+        cmake --version
+        ninja --version  # 验证 ninja-build 是否正确安装
 
     - name: Build Project
       run: |
-        cmake -B build -G ninja-build
+        cmake -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_m3.cmake
         cmake --build build --target all
 
     - name: Upload Artifacts
