@@ -14,29 +14,43 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install ARM GCC Toolchain
+    - name: Install ARM GCC Toolchain (智能版本适配)
       run: |
-        # 使用ARM官方工具链
-        $url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
-        #$url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
+        # 下载工具链
+        #$url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
+        $url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
         Invoke-WebRequest -Uri $url -OutFile toolchain.zip
-        
-        # 解压ZIP文件到当前目录
         Expand-Archive -Path toolchain.zip -DestinationPath . -Force
-        cd arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi
-        # 验证工具链文件是否存在
+        
+        # 智能检测bin目录位置
+        $binPath = $null
+        
+        # 先检查当前目录下是否有bin文件夹（14.3版本结构）
         if (Test-Path "bin/arm-none-eabi-gcc.exe") {
-            Write-Host "✅ 找到 arm-none-eabi-gcc.exe" -ForegroundColor Green
-        } else {
-            Write-Host "❌ 未找到 arm-none-eabi-gcc.exe" -ForegroundColor Red
-            Get-ChildItem "bin" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  - $($_.Name)" }
-            exit 1
+            $binPath = (Resolve-Path "bin").Path
+            Write-Host "✅ 检测到14.3版本目录结构" -ForegroundColor Green
+        }
+        # 再检查子目录中是否有bin文件夹（12.3版本结构）  
+        else {
+            $toolchainDirs = Get-ChildItem -Directory -Name "arm-gnu-toolchain-*" -ErrorAction SilentlyContinue
+            foreach ($dir in $toolchainDirs) {
+                if (Test-Path "$dir/bin/arm-none-eabi-gcc.exe") {
+                    $binPath = (Resolve-Path "$dir/bin").Path
+                    Write-Host "✅ 检测到12.3版本目录结构: $dir" -ForegroundColor Green
+                    break
+                }
+            }
         }
         
-        # 设置PATH（直接使用当前目录下的bin文件夹）
-        $binPath = (Resolve-Path "bin").Path
+        if (-not $binPath) {
+            Write-Host "❌ 未找到有效的工具链目录" -ForegroundColor Red
+            exit 1
+        }
+    
+        # 设置PATH
         echo "$binPath" >> $env:GITHUB_PATH
         Write-Host "✅ PATH已设置: $binPath" -ForegroundColor Green
+
          
     - name: Install Build Tools
       run: |
