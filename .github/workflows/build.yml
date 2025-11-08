@@ -23,13 +23,18 @@ jobs:
         # 解压ZIP文件到当前目录
         Expand-Archive -Path toolchain.zip -DestinationPath .
 
-        # 静默安装到当前目录
-        #.\arm-toolchain.exe /S /D=$PWD\arm-toolchain
-        
-        # 设置PATH
-        #echo "$PWD\arm-toolchain\bin" >> $env:GITHUB_PATH
-        #echo "Toolchain path: $env:ARM_TOOLCHAIN_PATH"     
-    
+        # 查找解压后的工具链目录（通常以"arm-gnu-toolchain-"开头）
+        $toolchainDir = Get-ChildItem -Directory -Name "arm-gnu-toolchain-*" | Select-Object -First 1
+        if (-not $toolchainDir) {
+            Write-Host "❌ 解压后未找到工具链目录" -ForegroundColor Red
+            exit 1
+        }
+
+        # 将工具链的bin目录添加到PATH
+        $binPath = (Resolve-Path "$toolchainDir/bin").Path
+        echo "$binPath" >> $env:GITHUB_PATH
+        Write-Host "✅ 工具链安装完成，PATH已设置: $binPath" -ForegroundColor Green    
+            
     - name: Install Build Tools
       run: |
         choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
