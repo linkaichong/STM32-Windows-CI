@@ -14,7 +14,7 @@ jobs:
 
     - name: Install ARM GCC Toolchain
       run: |
-        # 仅核心步骤：下载+解压+设置PATH
+        # 修正后的核心步骤
         $url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
         Invoke-WebRequest -Uri $url -OutFile t.zip
         Expand-Archive -Path t.zip -DestinationPath .
