@@ -31,9 +31,10 @@ jobs:
         # 解压到当前目录
         Expand-Archive -Path arm-toolchain.zip -DestinationPath .
         
-        # 将新工具链添加到PATH（覆盖Chocolatey的旧版本）
-        $toolchainPath = Resolve-Path "arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi/bin"
-        echo "::add-path::$toolchainPath"
+        # 获取工具链bin目录路径并添加到PATH（无需删除任何目录）
+        $toolchainDir = Get-ChildItem -Directory -Name "arm-gnu-toolchain-*" | Select-Object -First 1
+        $binPath = Resolve-Path "$toolchainDir/bin"
+        echo "$binPath" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
 
     # 步骤3：安装CMake和Ninja（Windows版本）
     - name: Install CMake and Ninja
