@@ -1,0 +1,36 @@
+name: STM32 Windows CI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install ARM GCC Toolchain
+      run: |
+        # 仅核心步骤：下载+解压+设置PATH
+        $url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
+        Invoke-WebRequest -Uri $url -OutFile t.zip
+        Expand-Archive -Path t.zip -DestinationPath .
+        echo "$((Get-Item 'arm-gnu-toolchain-*/bin').FullName)" >> $env:GITHUB_PATH
+
+    - name: Install Build Tools
+      run: |
+        choco install cmake ninja -y
+
+    - name: Build Project
+      run: |
+        cmake -B build -G Ninja
+        cmake --build build
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware
+        path: build/*.bin
