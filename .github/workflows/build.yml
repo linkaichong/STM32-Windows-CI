@@ -2,7 +2,7 @@ name: STM32 Windows CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   build:
