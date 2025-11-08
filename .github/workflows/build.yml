@@ -18,8 +18,11 @@ jobs:
       run: |
         # 使用您找到的快速下载源 - 选择较新版本
         $url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
-        Invoke-WebRequest -Uri $url -OutFile arm-toolchain.exe
+        Invoke-WebRequest -Uri $url -OutFile toolchain.zip
         
+        # 解压ZIP文件到当前目录
+        Expand-Archive -Path toolchain.zip -DestinationPath .
+
         # 静默安装到当前目录
         #.\arm-toolchain.exe /S /D=$PWD\arm-toolchain
         
