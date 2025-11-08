@@ -6,26 +6,22 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Install ARM GCC Toolchain
-      run: |
-        wget https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-x86_64-arm-none-eabi.tar.xz
-        tar -xf arm-gnu-toolchain-*.tar.xz
-        echo `pwd`/arm-gnu-toolchain-*/bin >> $GITHUB_PATH
+    - name: Install ARM toolchain
+      run: sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi 
 
     - name: Install Build Tools
-      run: |
-        choco install cmake ninja -y
+      run: sudo apt-get install cmake ninja
 
     - name: Build Project
       run: |
         cmake -B build -G Ninja
-        cmake --build build
+        cmake --build build --target all
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
