@@ -20,7 +20,7 @@ jobs:
 
     - name: Build Project
       run: |
-        cmake -B build -G Ninja
+        cmake -B build -G ninja-build
         cmake --build build --target all
 
     - name: Upload Artifacts
