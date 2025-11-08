@@ -7,8 +7,8 @@
             "command": "cmake",
             "args": [
                 "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE",
-                "-GMinGW Makefiles",
-                //"-GNinja",
+                //"-GMinGW Makefiles",
+                "-GNinja",
                 "-Bbuild"
             ],
             "group": {
@@ -19,15 +19,15 @@
         {
             "label": "CMake Build",
             "type": "shell",
-            //"command": "cmake",
-            "command": "mingw32-make",
+            "command": "cmake",
+            //"command": "mingw32-make",
             "args": [
-                "-C",
-                "build"
-                //"--build",
+                //"-C",
                 //"build",
-                //"--target",
-                //"all"
+                "--build",
+                "build",
+                "--target",
+                "all"
             ],
             "group": {
                 "kind": "build",
