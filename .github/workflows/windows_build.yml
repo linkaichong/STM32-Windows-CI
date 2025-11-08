@@ -1,0 +1,75 @@
+# 工作流名称，明确标注Windows环境
+name: STM32 Windows CI
+
+# 触发条件
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-windows:
+    # 关键修改：使用Windows运行器
+    runs-on: windows-latest
+    
+    steps:
+    # 步骤1：检出代码
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    # 步骤2：在Windows上安装ARM GCC工具链
+    - name: Install ARM GCC toolchain on Windows
+      run: |
+        # 方法1：使用 Chocolatey 包管理器（推荐）
+        choco install gcc-arm-embedded -y --no-progress
+        
+        # 方法2：或者手动下载安装（更可控）
+        # 这里使用Chocolatey，因为它更简单
+        echo "ARM GCC工具链安装完成"
+
+    # 步骤3：安装CMake和Ninja（Windows版本）
+    - name: Install CMake and Ninja
+      run: |
+        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
+        choco install ninja -y
+
+    # 步骤4：验证工具链安装
+    - name: Verify installations
+      run: |
+        echo "检查工具版本："
+        arm-none-eabi-gcc --version
+        cmake --version
+        ninja --version
+
+    # 步骤5：配置项目（注意Windows路径）
+    - name: Configure project with CMake
+      run: |
+        # 在Windows上创建build目录并配置
+        cmake -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_m3.cmake
+
+    # 步骤6：编译项目
+    - name: Build project
+      run: |
+        cmake --build build --verbose
+
+    # 步骤7：验证构建产物（Windows路径）
+    - name: Verify build artifacts
+      run: |
+        echo "生成的固件文件："
+        dir build\*.elf build\*.bin build\*.hex 2>nul || echo "未找到文件"
+        echo "文件信息："
+        if exist build\*.elf ( arm-none-eabi-size build\*.elf )
+
+    # 步骤8：上传构建产物
+    - name: Upload firmware artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: stm32-firmware-windows
+        path: |
+          build/*.elf
+          build/*.bin
+          build/*.hex
+        retention-days: 7
