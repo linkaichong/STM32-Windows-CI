@@ -21,11 +21,11 @@ jobs:
         Invoke-WebRequest -Uri $url -OutFile arm-toolchain.exe
         
         # 静默安装到当前目录
-        .\arm-toolchain.exe /S /D=$PWD\arm-toolchain
+        #.\arm-toolchain.exe /S /D=$PWD\arm-toolchain
         
         # 设置PATH
-        echo "$PWD\arm-toolchain\bin" >> $env:GITHUB_PATH
-        echo "Toolchain path: $env:ARM_TOOLCHAIN_PATH"     
+        #echo "$PWD\arm-toolchain\bin" >> $env:GITHUB_PATH
+        #echo "Toolchain path: $env:ARM_TOOLCHAIN_PATH"     
     
     - name: Install Build Tools
       run: |
