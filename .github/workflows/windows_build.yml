@@ -34,7 +34,7 @@ jobs:
         # 获取工具链bin目录路径并添加到PATH（无需删除任何目录）
         $toolchainDir = Get-ChildItem -Directory -Name "arm-gnu-toolchain-*" | Select-Object -First 1
         $binPath = Resolve-Path "$toolchainDir/bin"
-        echo "$binPath" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
+        echo "$binPath" | Out-File -FilePath $env:GITHUB_PATH -Append 
 
     # 步骤3：安装CMake和Ninja（Windows版本）
     - name: Install CMake and Ninja
