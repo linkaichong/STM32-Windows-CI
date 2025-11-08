@@ -17,13 +17,14 @@ jobs:
     - name: Install ARM GCC Toolchain
       run: |
         # 使用ARM官方工具链
-        #$url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
-        $url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
+        $url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
+        #$url = "https://armkeil.blob.core.windows.net/developer/Files/downloads/gnu/14.3.rel1/binrel/arm-gnu-toolchain-14.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
         Invoke-WebRequest -Uri $url -OutFile toolchain.zip
         
         # 解压ZIP文件到当前目录
-        Expand-Archive -Path toolchain.zip -DestinationPath . -Force
-
+        #Expand-Archive -Path toolchain.zip -DestinationPath . -Force
+        Expand-Archive -Path toolchain.zip -DestinationPath .
+        ls
         # 验证工具链文件是否存在
         if (Test-Path "bin/arm-none-eabi-gcc.exe") {
             Write-Host "✅ 找到 arm-none-eabi-gcc.exe" -ForegroundColor Green
