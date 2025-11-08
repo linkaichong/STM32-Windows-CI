@@ -21,20 +21,24 @@ jobs:
         submodules: recursive
 
     # 步骤2：在Windows上安装ARM GCC工具链
-    - name: Install ARM GCC toolchain on Windows
+    - name: Install Official ARM GCC Toolchain (Latest)
       run: |
-        # 方法1：使用 Chocolatey 包管理器（推荐）
-        choco install gcc-arm-embedded -y --no-progress
+        # 下载ARM官方最新工具链（12.3版本）
+        $TOOLCHAIN_VERSION = "12.3.rel1"
+        $url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
+        Invoke-WebRequest -Uri $url -OutFile arm-toolchain.zip
         
-        # 方法2：或者手动下载安装（更可控）
-        # 这里使用Chocolatey，因为它更简单
-        echo "ARM GCC工具链安装完成"
+        # 解压到当前目录
+        Expand-Archive -Path arm-toolchain.zip -DestinationPath .
+        
+        # 将新工具链添加到PATH（覆盖Chocolatey的旧版本）
+        $toolchainPath = Resolve-Path "arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi/bin"
+        echo "::add-path::$toolchainPath"
 
     # 步骤3：安装CMake和Ninja（Windows版本）
     - name: Install CMake and Ninja
       run: |
-        choco install cmake --installargs 'ADD_CMAKE_TO_PATH=System' -y
-        choco install ninja -y
+        choco install cmake ninja -y --no-progress
 
     # 步骤4：验证工具链安装
     - name: Verify installations
@@ -45,7 +49,7 @@ jobs:
         ninja --version
 
     # 步骤5：配置项目（注意Windows路径）
-    - name: Configure project with CMake
+    - name: Configure project
       run: |
         # 在Windows上创建build目录并配置
         cmake -B build -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/cortex_m3.cmake
