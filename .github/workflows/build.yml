@@ -17,22 +17,16 @@ jobs:
     - name: Install ARM GCC Toolchain (Fixed)
       run: |
         # 使用您找到的快速下载源 - 选择较新版本
-        $url = "https://sysprogs.com/files/gnutoolchains/arm-eabi/arm-eabi-gcc13.3.1-r3.exe"  
+        $url = "https://sysprogs.com/files/gnutoolchains/arm-eabi/arm-eabi-gcc13.3.1-r3.exe"
+        # 或者备用链接：arm-eabi-gcc12.3.1.exe (53MB，更稳定)
+        
         Invoke-WebRequest -Uri $url -OutFile arm-toolchain.exe
-
-        # 验证下载文件是否完整
         
-         
         # 静默安装到当前目录
-        Start-Process -Wait -FilePath ".\arm-toolchain.exe" -ArgumentList "/S", "/D=$PWD\arm-toolchain"
+        .\arm-toolchain.exe /S /D=$PWD\arm-toolchain
         
-        # 验证安装是否成功
-    
-
-        # 设置PATH（确保使用绝对路径）
-        $binPath = (Resolve-Path "arm-toolchain\bin").Path
-        echo "$binPath" >> $env:GITHUB_PATH
-
+        # 设置PATH
+        echo "$PWD\arm-toolchain\bin" >> $env:GITHUB_PATH
 
     - name: Install Build Tools
       run: |
