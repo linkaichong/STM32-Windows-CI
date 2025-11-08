@@ -14,12 +14,15 @@ jobs:
 
     - name: Install ARM GCC Toolchain
       run: |
-        # 修正后的核心步骤
+        # 仅下载和解压，不进行任何删除操作
         $url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
-        Invoke-WebRequest -Uri $url -OutFile t.zip
-        Expand-Archive -Path t.zip -DestinationPath .
-        echo "$((Get-Item 'arm-gnu-toolchain-*/bin').FullName)" >> $env:GITHUB_PATH
-
+        Invoke-WebRequest -Uri $url -OutFile toolchain.zip
+        Expand-Archive -Path toolchain.zip -DestinationPath .
+        
+        # 仅设置PATH，不删除任何文件
+        $toolchainPath = (Get-Item "arm-gnu-toolchain-*/bin").FullName
+        echo "$toolchainPath" | Out-File -FilePath $env:GITHUB_PATH -Append
+        
     - name: Install Build Tools
       run: |
         choco install cmake ninja -y
