@@ -19,7 +19,7 @@ jobs:
       run: |
         # 清理工作区，确保从头开始
         Remove-Item -Recurse -Force * -ErrorAction SilentlyContinue
-        
+
     # 步骤1：检出代码
     - name: Checkout code
       uses: actions/checkout@v4
@@ -31,16 +31,14 @@ jobs:
       run: |
         # 下载ARM官方最新工具链（12.3版本）
         $TOOLCHAIN_VERSION = "12.3.rel1"
+        # 最简单的下载和解压，不做任何额外操作
         $url = "https://developer.arm.com/-/media/Files/downloads/gnu/12.3.rel1/binrel/arm-gnu-toolchain-12.3.rel1-mingw-w64-i686-arm-none-eabi.zip"
-        Invoke-WebRequest -Uri $url -OutFile arm-toolchain.zip
+        Invoke-WebRequest -Uri $url -OutFile toolchain.zip
+        Expand-Archive -Path toolchain.zip -DestinationPath .
         
-        # 解压到当前目录
-        Expand-Archive -Path arm-toolchain.zip -DestinationPath .
-        
-        # 获取工具链bin目录路径并添加到PATH（无需删除任何目录）
-        $toolchainDir = Get-ChildItem -Directory -Name "arm-gnu-toolchain-*" | Select-Object -First 1
-        $binPath = Resolve-Path "$toolchainDir/bin"
-        echo "$binPath" | Out-File -FilePath $env:GITHUB_PATH -Append 
+        # 只设置PATH，不做任何删除操作
+        $path = (Get-Item "arm-gnu-toolchain-*/bin").FullName
+        echo "$path" >> $env:GITHUB_PATH
 
     # 步骤3：安装CMake和Ninja（Windows版本）
     - name: Install CMake and Ninja
