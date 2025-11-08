@@ -21,20 +21,50 @@ jobs:
         Invoke-WebRequest -Uri $url -OutFile toolchain.zip
         
         # 解压ZIP文件到当前目录
-        Expand-Archive -Path toolchain.zip -DestinationPath .
+        Expand-Archive -Path toolchain.zip -DestinationPath . -Force
 
-        # 查找解压后的工具链目录（通常以"arm-gnu-toolchain-"开头）
-        $toolchainDir = Get-ChildItem -Directory -Name "arm-gnu-toolchain-*" | Select-Object -First 1
+        # 调试：查看解压后的目录结构
+        Write-Host "=== 解压后的目录结构 ===" -ForegroundColor Yellow
+        Get-ChildItem -Directory | ForEach-Object { 
+            Write-Host "目录: $($_.Name)" -ForegroundColor Cyan
+        }
+        
+        # 多种可能的目录模式尝试
+        $possiblePatterns = @(
+            "arm-gnu-toolchain-*",
+            "arm-*-none-eabi",
+            "gcc-arm-*"
+        )
+        
+        $toolchainDir = $null
+        foreach ($pattern in $possiblePatterns) {
+            $dirs = Get-ChildItem -Directory -Name $pattern -ErrorAction SilentlyContinue
+            if ($dirs) {
+                $toolchainDir = $dirs[0]
+                Write-Host "✓ 找到工具链目录: $toolchainDir (模式: $pattern)" -ForegroundColor Green
+                break
+            }
+        }
+        
         if (-not $toolchainDir) {
-            Write-Host "❌ 解压后未找到工具链目录" -ForegroundColor Red
+            Write-Host "❌ 未找到工具链目录，当前所有目录:" -ForegroundColor Red
+            Get-ChildItem -Directory | ForEach-Object { Write-Host "  - $($_.Name)" }
             exit 1
         }
-
-        # 将工具链的bin目录添加到PATH
+        
+        # 设置PATH
         $binPath = (Resolve-Path "$toolchainDir/bin").Path
         echo "$binPath" >> $env:GITHUB_PATH
-        Write-Host "✅ 工具链安装完成，PATH已设置: $binPath" -ForegroundColor Green    
-            
+        Write-Host "✅ PATH已设置: $binPath" -ForegroundColor Green
+        
+        # 验证工具链可执行文件存在
+        if (Test-Path "$toolchainDir/bin/arm-none-eabi-gcc.exe") {
+            Write-Host "✅ 找到 arm-none-eabi-gcc.exe" -ForegroundColor Green
+        } else {
+            Write-Host "❌ 未找到 arm-none-eabi-gcc.exe，bin目录内容:" -ForegroundColor Red
+            Get-ChildItem "$toolchainDir/bin" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host "  - $($_.Name)" }
+        }
+         
     - name: Install Build Tools
       run: |
         choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
