@@ -1,3 +1,4 @@
+.cache/
 # 构建输出
 build/
 *.bin
@@ -18,3 +19,4 @@ Desktop.ini
 .vscode/ipch/
 *.swp
 *.swo
+

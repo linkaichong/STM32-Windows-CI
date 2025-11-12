@@ -8,7 +8,7 @@ void led_init()
     __HAL_RCC_GPIOB_CLK_ENABLE();
 
     GPIO_InitTypeDef cfg = {};
-    cfg.Pin = GPIO_PIN_0;
+    cfg.Pin = GPIO_PIN_5;
     cfg.Mode = GPIO_MODE_OUTPUT_PP;
     cfg.Pull = GPIO_NOPULL;
     cfg.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -23,9 +23,9 @@ int main()
 
     for ( ; ; )
     {
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
         HAL_Delay(2000);
-        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
         HAL_Delay(2000);
     }
 }
